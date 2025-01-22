@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "internal/api/grpc/pb;pb";
+
+service UserService {
+ rpc GetUser(UserIDRequest) returns (User);
+ rpc CreateUser(CreateUserRequest) returns (User);
+ rpc DeleteUser(UserIDRequest) returns (DeleteUserResponse);
+ rpc UpdateUser(User) returns (User);
+ rpc GetAllUsers(EmptyRequest) returns (AllUsersResponse);
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message UserIDRequest {
+  string id = 1;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message DeleteUserResponse {
+  string id = 1;
+}
+
+message AllUsersResponse {
+  repeated User users = 1;
+}
+
+message EmptyRequest {}
