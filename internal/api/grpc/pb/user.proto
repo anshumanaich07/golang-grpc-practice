@@ -5,11 +5,17 @@ package user;
 option go_package = "internal/api/grpc/pb;pb";
 
 service UserService {
+ rpc AddUser(AddUserReq) returns (User);
  rpc GetUser(UserIDRequest) returns (User);
  rpc CreateUser(CreateUserRequest) returns (User);
  rpc DeleteUser(UserIDRequest) returns (DeleteUserResponse);
  rpc UpdateUser(User) returns (User);
  rpc GetAllUsers(EmptyRequest) returns (AllUsersResponse);
+}
+
+message AddUserReq {
+  string name = 1;
+  string email = 2;
 }
 
 message User {

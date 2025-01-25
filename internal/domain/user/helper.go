@@ -16,18 +16,19 @@ func ConvertUserIDReqToInt(id *pb.UserIDRequest) (int, error) {
 	return i, nil
 }
 
-func ConvertToUser(u *pb.User) (*User, error) {
+func ConvertToUser(u *pb.AddUserReq) (*User, error) {
 	user := &User{}
-	if u.Id == "" {
-		return nil, errors.New("ID is empty")
-	}
-	uid, err := strconv.Atoi(u.Id)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to convert string ID to int")
-	}
-	user.ID = uint(uid)
+	user.Email = u.GetEmail()
+	user.Name = u.GetName()
+
+	return user, nil
+}
+
+func ConvertUserToPbUser(u User) *pb.User {
+	user := &pb.User{}
+	user.Id = strconv.Itoa(int(u.ID))
 	user.Email = u.Email
 	user.Name = u.Name
 
-	return user, nil
+	return user
 }

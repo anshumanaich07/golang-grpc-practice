@@ -4,6 +4,7 @@ import (
 	grpc "learn-grpc/internal/api/grpc/server"
 	"learn-grpc/internal/config"
 	"learn-grpc/internal/database"
+	"learn-grpc/internal/domain/user"
 	"log"
 )
 
@@ -22,6 +23,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// migrate schemas
+	db.AutoMigrate(&user.User{})
 
 	// registering grpc services
 	err = grpc.RegisterUserService(grpcConf, db)

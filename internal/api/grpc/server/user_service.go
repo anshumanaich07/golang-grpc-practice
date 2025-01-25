@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"learn-grpc/internal/api/grpc/pb"
 	"learn-grpc/internal/domain/user"
 
@@ -21,22 +20,36 @@ func NewUserServiceImpl(userUsecase user.UserUsecase) *UserServiceImpl {
 	}
 }
 
+func (usi *UserServiceImpl) AddUser(ctx context.Context, userReq *pb.AddUserReq) (*pb.User, error) {
+	// validate userReq
+	if userReq.Email == "" || userReq.Name == "" {
+		return nil, errors.New("Email or Name cannot be empty")
+	}
+
+	userModel, err := user.ConvertToUser(userReq)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to convert to User")
+	}
+
+	respUser, err := usi.UserUsecase.AddUser(ctx, *userModel)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to convert to User")
+	}
+	convUser := user.ConvertUserToPbUser(*respUser)
+
+	// convert to pb User
+	return convUser, nil
+}
 func (usi *UserServiceImpl) GetUser(ctx context.Context, userID *pb.UserIDRequest) (*pb.User, error) {
-	fmt.Println("reached the grpc method 'GetUser'")
+	// validate the request
 	if userID.Id == "" {
 		return nil, errors.New("user ID request cannot be empty")
 	}
-
 	idInt, err := user.ConvertUserIDReqToInt(userID)
 	if err != nil {
 		return nil, err
 	}
-
 	usi.UserUsecase.GetUserByID(ctx, idInt)
-
-	// convert the request
-	// validate the request
-	// call the usecase
 
 	return nil, nil
 }

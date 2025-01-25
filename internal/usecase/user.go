@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"learn-grpc/internal/domain/user"
 )
 
@@ -17,7 +16,10 @@ func NewUserUsecase(userRepo user.UserRepository) (*userUsecase, error) {
 }
 
 func (userUC *userUsecase) GetUserByID(ctx context.Context, userID int) (*user.User, error) {
-	fmt.Println("user usecase")
 	userUC.UserRepo.GetUserByID(ctx, 0)
 	return nil, nil
+}
+
+func (userUC *userUsecase) AddUser(ctx context.Context, user user.User) (*user.User, error) {
+	return userUC.UserRepo.AddUser(ctx, user)
 }
