@@ -3,6 +3,8 @@ package grpc
 import (
 	"fmt"
 	"learn-grpc/internal/config"
+	"learn-grpc/internal/repository"
+	"learn-grpc/internal/usecase"
 	"log"
 	"net"
 
@@ -11,9 +13,10 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"gorm.io/gorm"
 )
 
-func RegisterService(grpcConfig *config.GRPCConfig) error {
+func RegisterUserService(grpcConfig *config.GRPCConfig, db *gorm.DB) error {
 	lis, err := net.Listen(grpcConfig.Protocol, fmt.Sprintf(":%d", grpcConfig.Port))
 	if err != nil {
 		return errors.Wrap(err, "unable to listen on port")
@@ -23,8 +26,17 @@ func RegisterService(grpcConfig *config.GRPCConfig) error {
 	grpcServer := grpc.NewServer()
 
 	// register methods
+	userRepo, err := repository.NewUserRepo(db)
+	if err != nil {
+		return errors.Wrap(err, "unable to get gorm DB object")
+	}
+	userUC, err := usecase.NewUserUsecase(userRepo)
+	if err != nil {
+		return errors.Wrap(err, "unable to get user usecase")
+	}
+	userSrv := NewUserServiceImpl(userUC)
 
-	pb.RegisterUserServiceServer(grpcServer, &UserServiceImpl{})
+	pb.RegisterUserServiceServer(grpcServer, userSrv)
 
 	// reflection: exposes the methods available
 	reflection.Register(grpcServer)

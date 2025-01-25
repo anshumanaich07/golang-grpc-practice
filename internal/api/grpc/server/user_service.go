@@ -4,21 +4,35 @@ import (
 	"context"
 	"fmt"
 	"learn-grpc/internal/api/grpc/pb"
+	"learn-grpc/internal/domain/user"
+
+	"github.com/pkg/errors"
 )
 
 // this struct will implement all the interface methods in 'user_grpc.pb.go'
 type UserServiceImpl struct {
+	UserUsecase user.UserUsecase
 	pb.UnimplementedUserServiceServer
+}
+
+func NewUserServiceImpl(userUsecase user.UserUsecase) *UserServiceImpl {
+	return &UserServiceImpl{
+		UserUsecase: userUsecase,
+	}
 }
 
 func (usi *UserServiceImpl) GetUser(ctx context.Context, userID *pb.UserIDRequest) (*pb.User, error) {
 	fmt.Println("reached the grpc method 'GetUser'")
-	fmt.Println("ReqID: ", userID)
-	// res := &pb.User{
-	// 	Id:    userID.Id,
-	// 	Name:  "Anshuman Aich",
-	// 	Email: "anshumanaich@gmail.com",
-	// }
+	if userID.Id == "" {
+		return nil, errors.New("user ID request cannot be empty")
+	}
+
+	idInt, err := user.ConvertUserIDReqToInt(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	usi.UserUsecase.GetUserByID(ctx, idInt)
 
 	// convert the request
 	// validate the request
