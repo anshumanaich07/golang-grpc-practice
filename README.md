@@ -10,6 +10,6 @@
 * Update user
 
 ### Tech Stack
-* Backend: Golang
+* Backend: Golang, GORM
 * Microservices: gRPC
-* Database: MySQL
+* Database: PostgreSQL
